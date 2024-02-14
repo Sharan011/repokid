@@ -1,26 +1,23 @@
 
-#write a sample code on ruby to print the numbers from 1 to 10
+function countNumbers(arr) {
+  arr.forEach(pair => {
+    let noRepeat = [];
+    let repeat = [];
+    for(let num = pair[0]; num <= pair[1]; num++) {
+      let digits = num.toString().split('');
+      let uniqueDigits = [...new Set(digits)];
+      if(digits.length === uniqueDigits.length) {
+        noRepeat.push(num);
+      } else {
+        repeat.push(num);
+      }
+    }
+    console.log(`Numbers without repeating digits: ${noRepeat}`);
+    console.log(`Numbers with repeating digits: ${repeat}`);
+  });
+}
 
-
- function countNumbers(arr) {
-      arr.forEach(pair => {
-          let noRepeat = [];
-              let repeat = [];
-                  for(let num = pair[0]; num <= pair[1]; num++) {
-                        let digits = num.toString().split('');
-                              let uniqueDigits = [...new Set(digits)];
-                                    if(digits.length === uniqueDigits.length) {
-                                            noRepeat.push(num);
-                                                  } else {
-                                                          repeat.push(num);
-                                                                }
-                                                                    }
-                                                                        console.log(`Numbers without repeating digits: ${noRepeat}`);
-                                                                            console.log(`Numbers with repeating digits: ${repeat}`);
-                                                                              });
-                                                                              }
-
-                                                                              countNumbers([[10, 20], [30, 40]]);
+countNumbers([[10, 20], [30, 40]]);
 
 
 const readline = require('readline');
@@ -36,64 +33,64 @@ const rl = readline.createInterface({
       input.push(line.trim());
       });
 
-      rl.on('close', () => {
-        let q = parseInt(input[0]);
-          let arr = [];
-            for(let i = 1; i <= q; i++) {
-                let pair = input[i].split(' ').map(Number);
-                    arr.push(pair);
-                      }
-                        countNumbers(arr);
-                        });
+    rl.on('close', () => {
+      let q = parseInt(input[0]);
+      let arr = [];
+      for(let i = 1; i <= q; i++) {
+        let pair = input[i].split(' ').map(Number);
+        arr.push(pair);
+      }
+    });
+    countNumbers(arr);
+});
 
-                        function countNumbers(arr) {
-                          arr.forEach(pair => {
-                              let count = 0;
-                                  for(let num = pair[0]; num <= pair[1]; num++) {
-                                        let digits = num.toString().split('');
-                                              let uniqueDigits = [...new Set(digits)];
-                                                    if(digits.length === uniqueDigits.length) {
-                                                            count++;
-                                                                  }
-                                                                      }
-                                                                          console.log(`Count of numbers without repeating digits: ${count}`);
-                                                                            });
-                                                                            }
+function countNumbers(arr) {
+  arr.forEach(pair => {
+  let count = 0;
+    for(let num = pair[0]; num <= pair[1]; num++) {
+      let digits = num.toString().split('');
+      let uniqueDigits = [...new Set(digits)];
+      if(digits.length === uniqueDigits.length) {
+        count++;
+      }
+    }
+  console.log(`Count of numbers without repeating digits: ${count}`);
+  });
+}
 
- }SELECT c.iban, ROUND(b.amount, 2) AS amount
- FROM customers c
- JOIN balances b ON c.customer_id = b.customer_id
- WHERE b.amount > 0 AND b.amount < 100
- ORDER BY b.amount DESC;
+SELECT c.iban, ROUND(b.amount, 2) AS amount
+FROM customers c
+JOIN balances b ON c.customer_id = b.customer_id
+WHERE b.amount > 0 AND b.amount < 100
+ORDER BY b.amount DESC;
 
 
 
- function getTotalExecutionTime(n, logs) {
-        let res = new Array(n).fill(0);
-            let stack = [];
-                let prevTime = 0;
+function getTotalExecutionTime(n, logs) {
+  let res = new Array(n).fill(0);
+  let stack = [];
+  let prevTime = 0;
 
-                    for (let i = 0; i < logs.length; i++) {
-                            let parts = logs[i].split(":");
-                                    let id = parseInt(parts[0]);
-                                            let action = parts[1];
-                                                    let timestamp = parseInt(parts[2]);
+  for (let i = 0; i < logs.length; i++) {
+    let parts = logs[i].split(":");
+    let id = parseInt(parts[0]);
+    let action = parts[1];
+    let timestamp = parseInt(parts[2]);
 
-                                                            if (action === "start") {
-                                                                        if (stack.length > 0) {
-                                                                                        res[stack[stack.length - 1]] += timestamp - prevTime;
-                                                                                                    }
-                                                                                                                stack.push(id);
-                                                                                                                            prevTime = timestamp;
-                                                                                                                                    } else {
-                                                                                                                                                res[stack.pop()] += timestamp - prevTime + 1;
-                                                                                                                                                            prevTime = timestamp + 1;
-                                                                                                                                                                    }
-                                                                                                                                                                        }
+    if (action === "start") {
+      if (stack.length > 0) {
+        res[stack[stack.length - 1]] += timestamp - prevTime;
+      }
+      stack.push(id);
+      prevTime = timestamp;
+    } else {
+      res[stack.pop()] += timestamp - prevTime + 1;
+      prevTime = timestamp + 1;
+    }
+  }
 
-                                                                                                                                                                            return res;
-                                                                                                                                                                            }
+  return res;
+}
 
-                                                                                                                                                                            let logs = ["0:start:0","2:start:4", "2:end:5","1:start:7", "1:end:10", "0:end:11"];
-                                                                                                                                                                            console.log(getTotalExecutionTime(3, logs)); // <div 6,="" 4,="" 2=""></div>
- }
+let logs = ["0:start:0","2:start:4", "2:end:5","1:start:7", "1:end:10", "0:end:11"];
+console.log(getTotalExecutionTime(3, logs)); // <div 6,="" 4,="" 2=""></div>
