@@ -124,7 +124,8 @@ function ensure(value) {
 //this question is based on choose the answers
 //three correct answer chosen - line nos. 170,171,172 are correct
 //170- using querySelectorAll instead of just query Selector which will pick the first span but we need all span that has even nos.
-//171- passing item as a param to the function instead of event as for a particular item selection we need yellow color not for events which will change yellow everytime the event occurs
+//171- passing item as a param to the function instead of event as for a particular item selection we need yellow color not for events which 
+//will change yellow everytime the event occurs
 //172- its already not showing yellow bg so we first check if its not yello bg and if its return true then we change to yellow or else transprent
 function toggleEvenColor() {
   let elem = document.querySelectorAll('#numbers span:nth-child(2n)');
@@ -424,3 +425,199 @@ function findTwoSum(arr, target) {
 }
 let a = [1, 2, 3, -4, 5];
 console.log(findTwoSum(a, 2));
+
+
+///SQL ANSWERS
+SELECT count(*) FROM students WHERE firstName = 'John';
+
+//A table containing the students enrolled in a yearly course has incorrect data in records with ids between 20 and 100 (inclusive).
+// TABLE enrollments
+// --   id INTEGER NOT NULL PRIMARY KEY
+// --   year INTEGER NOT NULL
+// --   studentId INTEGER NOT NULL
+// --
+// -- Write a query that updates the field 'year' of every faulty record to 2015.
+
+UPDATE  enrollments set year = 2015 WHERE id >= 20 and id <= 100;
+
+// -- Information about pets is kept in two separate tables:
+// --
+// -- TABLE dogs
+// --   id INTEGER NOT NULL PRIMARY KEY,
+// --   name VARCHAR(50) NOT NULL
+// --
+// -- TABLE cats
+// --   id INTEGER NOT NULL PRIMARY KEY,
+// --   name VARCHAR(50) NOT NULL
+// --
+// -- Write a query that select all distinct pet names.
+// -- INSERT INTO dogs(id, name) values(1, 'Lola');
+// -- INSERT INTO dogs(id, name) values(2, 'Bella');
+// -- INSERT INTO cats(id, name) values(1, 'Lola');
+// -- INSERT INTO cats(id, name) values(2, 'Kitty');
+// --
+// -- Expected output (in any order):
+// -- name
+// -- -----
+// -- Bella
+// -- Kitty
+// -- Lola
+
+SELECT DISTINCT name FROM dogs UNION SELECT DISTINCT name FROM cats;
+
+// -- App usage data are kept in the following table:
+// --
+// -- TABLE sessions
+// --   id INTEGER PRIMARY KEY,
+// --   userId INTEGER NOT NULL,
+// --   duration DECIMAL NOT NULL
+// --
+// -- Write a query that selects userId and average session duration for each user who has more than one session.
+
+// -- Suggested testing environment:
+// -- http://sqlite.online/
+
+// -- Example case create statement:
+// -- CREATE TABLE sessions (
+// --   id INTEGER NOT NULL PRIMARY KEY,
+// --   userId INTEGER NOT NULL,
+// --   duration DECIMAL NOT NULL
+// -- );
+// --
+// -- INSERT INTO sessions(id, userId, duration) VALUES(1, 1, 10);
+// -- INSERT INTO sessions(id, userId, duration) VALUES(2, 2, 18);
+// -- INSERT INTO sessions(id, userId, duration) VALUES(3, 1, 14);
+// --
+// -- Expected output:
+// -- UserId  AverageDuration
+// -- -----------------------
+// -- 1       12
+
+SELECT userId, avg (duration) FROM sessions GROUP BY userId HAVING COUNT(userId) > 1;
+
+//Each item in a web shop belongs to a seller. To ensure service quality, each seller has a rating.
+// --
+// -- The data are kept in the following two tables:
+// --
+// -- TABLE sellers
+// --   id INTEGER PRIMARY KEY,
+// --   name VARCHAR(30) NOT NULL,
+// --   rating INTEGER NOT NULL
+// --
+// -- TABLE items
+// --   id INTEGER PRIMARY KEY,
+// --   name VARCHAR(30) NOT NULL,
+// --   sellerId INTEGER REFERENCES sellers(id)
+// --
+// -- Write a query that selects the item name and the name of its seller for each item that belongs to a seller with a rating greater than 4.
+
+SELECT items.name, sellers.name FROM items
+INNER JOIN sellers ON items.sellerId = sellers.id WHERE sellers.rating > 4;
+
+// -- The following data definition defines an organization's employee hierarchy.
+// --
+// -- An employee is a manager if any other employee has their managerId set to the first employees id. 
+//An employee who is a manager may or may not also have a manager.
+// --
+// -- TABLE employees
+// --   id INTEGER NOT NULL PRIMARY KEY
+// --   managerId INTEGER REFERENCES employees(id)
+// --   name VARCHAR(30) NOT NULL
+// --
+// -- Write a query that selects the names of employees who are not managers.
+
+SELECT name FROM employees
+WHERE id NOT IN (
+    SELECT e1.id FROM employees as e1 JOIN employees as e2 on e1.id = e2.managerId
+);
+
+
+// -- The following two tables are used to define users and their respective roles:
+// --
+// -- TABLE users
+// --   id INTEGER NOT NULL PRIMARY KEY,
+// --   userName VARCHAR(50) NOT NULL
+// --
+// -- TABLE roles
+// --   id INTEGER NOT NULL PRIMARY KEY,
+// --   role VARCHAR(20) NOT NULL
+// --
+// -- The users_roles table should contain the mapping between each user and their roles. Each user can have many roles, and each role can have many users.
+// --
+// -- Modify the provided SQLite create table statement so that:
+// --
+// --     Only users from the users table can exist within users_roles.
+// --     Only roles from the roles table can exist within users_roles.
+// --     A user can only have a specific role once.
+
+CREATE TABLE users_roles (
+  userId INTEGER not null,
+  roleId INTEGER not null,
+  foreign key (userId) references users(id),
+  foreign key (roleId) references roles(id),
+  unique (userId, roleId)
+);
+///////////////////////////
+CREATE PROCEDURE insertUser(
+    IN type VARCHAR(50),
+    IN email VARCHAR(50)
+)
+BEGIN
+    INSERT INTO users(email,userTypeId) VALUES (email, (SELECT id FROM userTypes WHERE userTypes.type = type));
+END
+
+////////////////
+Trigger item_delete AFTER DELETE item ROW item_archive(name) OLD.name
+
+//Items List
+CREATE PROCEDURE ItemsBought (@date DATE) AS
+BEGIN
+    SELECT DAY(dateBought) as day, MONTH(dateBought) as month, name FROM items 
+    WHERE dateBought >= @date AND dateBought <= DATEADD(month, 1, @date);
+END;
+
+//PArse MEssage
+CREATE PROCEDURE ParseMessages AS
+BEGIN
+
+  INSERT INTO notifications (id, message)
+  SELECT id, data
+  FROM messages
+  WHERE type = 'notification';
+  
+  INSERT INTO alerts (id, shortMessage)
+  SELECT id, SUBSTRING(data, 1, 15)
+  FROM messages
+  WHERE type = 'alert';
+END;
+
+
+//Question Variation
+CREATE PROCEDURE findLatestVersion(
+    IN questionId INTEGER
+)
+BEGIN
+  SELECT childId FROM questions WHERE questionId = questions.id;
+END
+
+//Regional Sales COmparison
+with SalesAvg as (
+  select Regions.name as rgn, 
+    CASE WHEN SUM(IFNULL(SL.amount,0)) = 0 THEN 0                    /*region with no sales returning 0*/
+    ELSE  SUM(IFNULL(SL.amount,0)) / COUNT(DISTINCT E.id) END as average             
+/*distinct employee count gives the correct value for number of employees in ther region.*/
+  from regions R
+    left join states S on R.id = S.regionId
+    left join employees E on S.id = E.stateId
+    left join sales SL on E.id = SL.employeeId
+  group by R.Id, R.name
+) 
+select 
+  rgn, 
+  average,
+  (select max(average) from SalesAvg)- average as difference        /*highest average sales -region average*/
+from SalesAvg
+group by rgn
+
+//last activity
+last_activity DATE_ADD create_date
